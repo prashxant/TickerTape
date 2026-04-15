@@ -19,7 +19,7 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TickerTape",
+  title: "Tick Ticker",
   description:
     "Track, filter, and explore market leaders with cinematic clarity.",
   icons: {
