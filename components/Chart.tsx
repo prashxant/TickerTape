@@ -91,7 +91,14 @@ export default function Chart({ chart, symbol }: ChartProps) {
   const minPrice = prices.length ? Math.min(...prices) : 0;
   const maxPrice = prices.length ? Math.max(...prices) : 0;
 
-  const formatPrice = (value: number | string | undefined) => {
+  const formatPrice = (
+    value: number | string | readonly (string | number)[] | undefined,
+  ) => {
+    if (Array.isArray(value)) {
+      const first = value[0];
+      return formatPrice(first);
+    }
+
     if (typeof value === "number") {
       return `$${value.toFixed(2)}`;
     }
