@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="TickerTape favicon">
+  <defs>
+    <linearGradient id="gArrow" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#10d98b" />
+      <stop offset="100%" stop-color="#36ea77" />
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" fill="#041f45" />
+
+  <g fill="#10d98b">
+    <rect x="128" y="232" width="22" height="114" rx="8" />
+    <rect x="174" y="198" width="22" height="148" rx="8" />
+    <rect x="220" y="254" width="22" height="92" rx="8" />
+    <rect x="312" y="238" width="38" height="108" rx="8" />
+  </g>
+
+  <path
+    d="M104 344 L214 212 L267 266 L352 164"
+    fill="none"
+    stroke="url(#gArrow)"
+    stroke-width="24"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M332 162 L364 154 L356 186 Z"
+    fill="url(#gArrow)"
+    stroke="url(#gArrow)"
+    stroke-width="10"
+    stroke-linejoin="round"
+  />
+
+  <g fill="#ef6461">
+    <path d="M262 190 L274 206 L286 190 V170 H262 Z" />
+    <path d="M262 295 L274 311 L286 295 V275 H262 Z" />
+  </g>
+
+  <path
+    d="M486 468 C494 468 500 462 500 454 C500 462 506 468 514 468 C506 468 500 474 500 482 C500 474 494 468 486 468 Z"
+    fill="#8aa1bf"
+    transform="translate(-24 -18) scale(0.72)"
+  />
+</svg>

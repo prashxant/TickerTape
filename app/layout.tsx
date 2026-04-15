@@ -22,6 +22,11 @@ export const metadata: Metadata = {
   title: "TickerTape",
   description:
     "Track, filter, and explore market leaders with cinematic clarity.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
