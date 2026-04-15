@@ -1,26 +1,174 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f2eee7;
+  --surface: rgba(255, 255, 255, 0.78);
+  --surface-strong: rgba(255, 255, 255, 0.94);
+  --foreground: #101728;
+  --muted: #56607a;
+  --accent: #be7440;
+  --accent-strong: #9c5328;
+  --line: rgba(16, 23, 40, 0.11);
+  --shadow: 0 26px 70px -34px rgba(18, 30, 66, 0.46);
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-line: var(--line);
+  --font-sans: var(--font-sora);
+  --font-mono: var(--font-plex-mono);
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(
+      circle at 0% 20%,
+      rgba(55, 102, 201, 0.22),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(190, 116, 64, 0.22),
+      transparent 44%
+    ),
+    linear-gradient(145deg, #f7f4ef, #e8e2d6);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sora), "Trebuchet MS", sans-serif;
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
+
+.page-shell {
+  max-width: 1160px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 2.2rem 1.2rem 3.2rem;
+}
+
+.hero-card {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--surface-strong);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.hero-card::before {
+  content: "";
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle,
+    rgba(190, 116, 64, 0.37),
+    transparent 70%
+  );
+  top: -62px;
+  right: -58px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 23, 40, 0.18);
+  background: rgba(255, 255, 255, 0.76);
+  padding: 0.3rem 0.75rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  font-family: var(--font-plex-mono), monospace;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.display-title {
+  font-family: var(--font-fraunces), Georgia, serif;
+  letter-spacing: -0.015em;
+  line-height: 0.95;
+}
+
+.surface-block {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 22px;
+  box-shadow: 0 24px 56px -42px rgba(16, 23, 40, 0.55);
+  backdrop-filter: blur(8px);
+}
+
+.btn-primary {
+  border-radius: 12px;
+  border: 1px solid rgba(10, 15, 30, 0.06);
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease,
+    filter 150ms ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  filter: saturate(1.08);
+  box-shadow: 0 12px 28px -14px rgba(156, 83, 40, 0.8);
+}
+
+.btn-ghost {
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--foreground);
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.fade-in {
+  animation: rise 520ms ease both;
+}
+
+.fade-in.delay-1 {
+  animation-delay: 85ms;
+}
+
+.fade-in.delay-2 {
+  animation-delay: 150ms;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 760px) {
+  .page-shell {
+    padding: 1.1rem 0.8rem 2rem;
+  }
+
+  .hero-card {
+    border-radius: 20px;
+  }
 }

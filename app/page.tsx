@@ -1,65 +1,196 @@
-import Image from "next/image";
+// app/page.tsx
+"use client";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import SearchBox from "@/components/SearchBox";
+import FilterChip from "@/components/FilterChip";
+import type { StockListItem } from "@/lib/types";
+import MarketStatus from "@/components/MarketStatus";
+
+const FILTERS = [
+  { key: "pe", label: "PE <= 20", param: "pe", value: "20" },
+  {
+    key: "marketCap",
+    label: "Market Cap >= 1B",
+    param: "marketCap",
+    value: "1000000000",
+  },
+  { key: "roe", label: "ROE >= 15%", param: "roe", value: "15" },
+  {
+    key: "debtEquity",
+    label: "Debt/Equity <= 0.5",
+    param: "debtEquity",
+    value: "0.5",
+  },
+  {
+    key: "dividendYield",
+    label: "Dividend Yield >= 2%",
+    param: "dividendYield",
+    value: "2",
+  },
+] as const;
+
+type FilterKey = (typeof FILTERS)[number]["key"];
 
 export default function Home() {
+  const [stocks, setStocks] = useState<StockListItem[]>([]);
+  const [activeFilters, setActiveFilters] = useState<FilterKey[]>([]);
+  const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const filterSummary = useMemo(() => {
+    if (activeFilters.length === 0) {
+      return "Showing all companies. Tap filters to narrow results.";
+    }
+
+    return `${activeFilters.length} filter${activeFilters.length > 1 ? "s" : ""} active`;
+  }, [activeFilters]);
+
+  useEffect(() => {
+    const runFilter = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const params = new URLSearchParams();
+
+        FILTERS.forEach((filter) => {
+          if (activeFilters.includes(filter.key)) {
+            params.set(filter.param, filter.value);
+          }
+        });
+
+        const query = params.toString();
+        const endpoint = query ? `/api/screener?${query}` : "/api/screener";
+
+        const res = await fetch(endpoint);
+        if (!res.ok) {
+          throw new Error(`Request failed with status ${res.status}`);
+        }
+
+        const data: StockListItem[] = await res.json();
+        setStocks(data);
+      } catch (err) {
+        setStocks([]);
+        setError(
+          err instanceof Error ? err.message : "Failed to load screener data",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void runFilter();
+  }, [activeFilters]);
+
+  const toggleFilter = (key: FilterKey) => {
+    setIsFilterMenuOpen(true);
+    setActiveFilters((prev) =>
+      prev.includes(key) ? prev.filter((item) => item !== key) : [...prev, key],
+    );
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <main className="page-shell ">
+      <section className="hero-card  p-5 sm:p-8 fade-in">
+        <div className="flex flex-col gap-5 sm:gap-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="max-w-2xl space-y-4">
+              <span className="pill">Market cockpit</span>
+              <h1 className="display-title text-4xl sm:text-6xl text-foreground">
+               Tick Ticker
+              </h1>
+              <p className="max-w-xl text-sm sm:text-base text-muted">
+                Scan market leaders, search instantly, and inspect valuation
+                signals in one editorial-grade interface.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm text-muted font-mono">
+              <div className="surface-block text-center  py-2">
+                <p className="text-[10px] uppercase tracking-[0.18em]">
+                  Universe
+                </p>
+                <p className="mt-1  text-base text-foreground">S&P 500</p>
+              </div>
+              <div className="surface-block px-3 py-2">
+                  <MarketStatus/>
+              </div>
+            </div>
+          </div>
+
+          <div className="fade-in delay-1">
+            <SearchBox />
+          </div>
+
+          <div className="relative fade-in delay-2">
+            <button
+              type="button"
+              onClick={() => setIsFilterMenuOpen((prev) => !prev)}
+              className="btn-primary px-4 py-2 text-sm"
+              aria-expanded={isFilterMenuOpen}
+              aria-controls="filters-dropdown"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              Filters
+            </button>
+
+            {isFilterMenuOpen ? (
+              <div
+                id="filters-dropdown"
+                className="mt-3 w-full rounded-2xl border border-line bg-white p-4 shadow-sm sm:max-w-3xl"
+              >
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {FILTERS.map((filter) => (
+                    <FilterChip
+                      key={filter.key}
+                      label={filter.label}
+                      selected={activeFilters.includes(filter.key)}
+                      onClick={() => toggleFilter(filter.key)}
+                    />
+                  ))}
+                </div>
+
+                <p className="text-xs text-muted">
+                  {loading ? "Filtering..." : filterSummary}
+                </p>
+                {error ? (
+                  <p className="mt-1 text-xs text-red-700">Error: {error}</p>
+                ) : null}
+
+                <div className="mt-3 max-h-80 overflow-y-auto rounded-xl border border-line">
+                  {stocks.length === 0 ? (
+                    <p className="p-4 text-sm text-muted">
+                      No companies match the selected filters.
+                    </p>
+                  ) : (
+                    <ul>
+                      {stocks.map((stock) => (
+                        <li
+                          key={stock.symbol}
+                          className="border-b border-line last:border-b-0"
+                        >
+                          <Link
+                            href={`/stock/${stock.symbol}`}
+                            className="flex items-center justify-between px-4 py-3 text-sm transition hover:bg-[rgba(16,23,40,0.04)]"
+                          >
+                            <span className="font-mono font-semibold text-foreground">
+                              {stock.symbol}
+                            </span>
+                            <span className="text-muted">
+                              {stock.name || "Unknown"}
+                            </span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            ) : null}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </section>
+    </main>
   );
 }

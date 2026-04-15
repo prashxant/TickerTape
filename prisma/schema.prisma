@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Stock {
+  id         Int      @id @default(autoincrement())
+  symbol     String   @unique
+  name       String?
+  sector     String?
+
+  price      Float?
+  marketCap  Float?
+  peRatio    Float?
+  roe        Float?
+  debtEquity Float?
+  dividendYield Float?
+
+  updatedAt  DateTime @updatedAt
+}
