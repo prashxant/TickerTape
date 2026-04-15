@@ -152,6 +152,117 @@ a {
   animation-delay: 150ms;
 }
 
+.fade-in.delay-3 {
+  animation-delay: 220ms;
+}
+
+.news-ribbon {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background:
+    linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0.85),
+      rgba(255, 255, 255, 0.72)
+    ),
+    radial-gradient(
+      circle at 10% 0%,
+      rgba(55, 102, 201, 0.15),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      rgba(190, 116, 64, 0.18),
+      transparent 48%
+    );
+}
+
+.ticker-viewport {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.ticker-viewport::before,
+.ticker-viewport::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 56px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ticker-viewport::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.95), transparent);
+}
+
+.ticker-viewport::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.95), transparent);
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-slide 80s linear infinite;
+}
+
+.ticker-viewport:hover .ticker-track {
+  animation-play-state: paused;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 0.95rem;
+  min-width: clamp(240px, 26vw, 360px);
+  border-right: 1px dashed rgba(16, 23, 40, 0.14);
+  transition: background-color 180ms ease;
+}
+
+.ticker-item:hover {
+  background: rgba(16, 23, 40, 0.04);
+}
+
+.ticker-source {
+  font-family: var(--font-plex-mono), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.65rem;
+  color: var(--accent-strong);
+  white-space: nowrap;
+}
+
+.ticker-headline {
+  font-size: 0.84rem;
+  color: var(--foreground);
+  line-height: 1.25;
+}
+
+.ticker-time {
+  margin-left: auto;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+@keyframes ticker-slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 @keyframes rise {
   from {
     opacity: 0;
@@ -170,5 +281,13 @@ a {
 
   .hero-card {
     border-radius: 20px;
+  }
+
+  .ticker-item {
+    min-width: 82vw;
+  }
+
+  .ticker-track {
+    animation-duration: 34s;
   }
 }

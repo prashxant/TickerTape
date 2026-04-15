@@ -6,6 +6,7 @@ import SearchBox from "@/components/SearchBox";
 import FilterChip from "@/components/FilterChip";
 import type { StockListItem } from "@/lib/types";
 import MarketStatus from "@/components/MarketStatus";
+import NewsTicker from "@/components/NewsTicker";
 
 const FILTERS = [
   { key: "pe", label: "PE <= 20", param: "pe", value: "20" },
@@ -99,7 +100,7 @@ export default function Home() {
             <div className="max-w-2xl space-y-4">
               <span className="pill">Market cockpit</span>
               <h1 className="display-title text-4xl sm:text-6xl text-foreground">
-               Tick Ticker
+                Tick Ticker
               </h1>
               <p className="max-w-xl text-sm sm:text-base text-muted">
                 Scan market leaders, search instantly, and inspect valuation
@@ -115,7 +116,7 @@ export default function Home() {
                 <p className="mt-1  text-base text-foreground">S&P 500</p>
               </div>
               <div className="surface-block px-3 py-2">
-                  <MarketStatus/>
+                <MarketStatus />
               </div>
             </div>
           </div>
@@ -188,6 +189,10 @@ export default function Home() {
                 </div>
               </div>
             ) : null}
+          </div>
+
+          <div className="fade-in delay-3">
+            <NewsTicker />
           </div>
         </div>
       </section>
