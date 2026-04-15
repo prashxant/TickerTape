@@ -91,6 +91,19 @@ export default function Chart({ chart, symbol }: ChartProps) {
   const minPrice = prices.length ? Math.min(...prices) : 0;
   const maxPrice = prices.length ? Math.max(...prices) : 0;
 
+  const formatPrice = (value: number | string | undefined) => {
+    if (typeof value === "number") {
+      return `$${value.toFixed(2)}`;
+    }
+
+    if (typeof value === "string") {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? `$${parsed.toFixed(2)}` : value;
+    }
+
+    return "N/A";
+  };
+
   return (
     <div className="surface-block p-4 sm:p-5 rounded-xl shadow">
       {/* Header */}
@@ -146,7 +159,7 @@ export default function Chart({ chart, symbol }: ChartProps) {
 
               {/* Tooltip */}
               <Tooltip
-                formatter={(value: number) => [`$${value.toFixed(2)}`, "Price"]}
+                formatter={(value) => [formatPrice(value), "Price"]}
                 contentStyle={{
                   borderRadius: 10,
                   border: "1px solid rgba(0,0,0,0.1)",
