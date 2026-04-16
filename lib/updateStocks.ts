@@ -1,7 +1,7 @@
-import yahooFinance from "yahoo-finance2";
+import YahooFinance from "yahoo-finance2";
 import { prisma } from "@/lib/prisma";
 
-const yf = new yahooFinance();
+const yf = new YahooFinance();
 
 type UpdateStocksJobOptions = {
   limit?: number;
@@ -44,8 +44,9 @@ export async function updateStocksJob(
 
     for (const stock of stocks) {
       try {
-        const data = await yf.quote(stock.symbol);
-        const summary = await yf.quoteSummary(stock.symbol, {
+        const yfSymbol = stock.symbol.replace(/\./g, "-");
+        const data = await yf.quote(yfSymbol);
+        const summary = await yf.quoteSummary(yfSymbol, {
           modules: ["financialData", "defaultKeyStatistics", "assetProfile"],
         });
 

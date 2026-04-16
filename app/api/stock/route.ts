@@ -1,7 +1,7 @@
 // app/api/stock/route.ts
-import yahooFinance from "yahoo-finance2";
+import YahooFinance from "yahoo-finance2";
 
-const yf = new yahooFinance();
+const yf = new YahooFinance();
 const ALLOWED_RANGES = new Set(["1d", "5d", "1mo", "1y"]);
 
 function getPeriod1(range: string): Date {
@@ -23,17 +23,18 @@ function getPeriod1(range: string): Date {
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const symbol = searchParams.get("symbol")?.trim().toUpperCase();
+    const rawSymbol = searchParams.get("symbol")?.trim().toUpperCase();
     const rawRange = searchParams.get("range") || "1mo";
     const range = ALLOWED_RANGES.has(rawRange) ? rawRange : "1mo";
 
-    if (!symbol) {
+    if (!rawSymbol) {
       return Response.json(
         { error: "symbol query param is required" },
         { status: 400 },
       );
     }
 
+    const symbol = rawSymbol.replace(/\./g, "-");
     const period1 = getPeriod1(range);
     const quotePromise = yf.quote(symbol);
     const chartPromise = yf.chart(symbol, {
