@@ -39,7 +39,7 @@ export default function Home() {
             <SearchBox />
           </div>
 
-          <div className="fade-in delay-2 flex justify-center mt-4">
+          <div className="fade-in delay-2 flex justify-start mt-4">
             <Link 
               href="/filter" 
               className="btn-primary w-full sm:w-auto px-8 py-4 text-base font-semibold inline-block text-center shadow-lg transition-transform hover:scale-105"

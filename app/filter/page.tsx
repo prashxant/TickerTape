@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { StockListItem } from "@/lib/types";
 import StockTable from "@/components/StockTable";
 
@@ -185,6 +186,7 @@ function NumericInput({
 }
 
 export default function FilterPage() {
+  const router = useRouter();
   const [stocks, setStocks] = useState<StockListItem[]>([]);
   const [draftFilters, setDraftFilters] =
     useState<ScreenerFilters>(EMPTY_FILTERS);
@@ -341,9 +343,13 @@ export default function FilterPage() {
             <h1 className="display-title text-3xl font-medium text-foreground">
               Stock Screener
             </h1>
-            <Link href="/" className="btn-ghost px-4 py-2 text-sm">
+            <button
+              type="button"
+              onClick={() => router.push("/")}
+              className="btn-ghost px-4 py-2 text-sm relative z-10 cursor-pointer"
+            >
               &larr; Back Home
-            </Link>
+            </button>
           </div>
 
           <div className="fade-in delay-2 rounded-2xl border border-line bg-white/85 p-4 sm:p-5">
