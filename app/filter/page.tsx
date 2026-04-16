@@ -2,8 +2,15 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import useSWR from "swr";
 import type { StockListItem } from "@/lib/types";
 import StockTable from "@/components/StockTable";
+
+const fetcher = (url: string) =>
+  fetch(url).then((res) => {
+    if (!res.ok) throw new Error(`Request failed with status ${res.status}`);
+    return res.json();
+  });
 
 const DEFAULT_SECTOR_OPTIONS = [
   "Technology",
@@ -187,7 +194,6 @@ function NumericInput({
 
 export default function FilterPage() {
   const router = useRouter();
-  const [stocks, setStocks] = useState<StockListItem[]>([]);
   const [draftFilters, setDraftFilters] =
     useState<ScreenerFilters>(EMPTY_FILTERS);
   const [appliedFilters, setAppliedFilters] =
@@ -196,11 +202,6 @@ export default function FilterPage() {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(15);
-  const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
-  const [availableSectors, setAvailableSectors] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const activeChips = useMemo(
     () => buildFilterChips(appliedFilters),
@@ -212,63 +213,38 @@ export default function FilterPage() {
       ? "Showing all companies. Add filters and click Apply Filters."
       : `${activeChips.length} active filter${activeChips.length > 1 ? "s" : ""}`;
 
-  useEffect(() => {
-    const runFilter = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const params = new URLSearchParams();
-
-        if (appliedFilters.sectors.length > 0) {
-          params.set("sectors", appliedFilters.sectors.join(","));
-        }
-
-        Object.entries(appliedFilters).forEach(([key, value]) => {
-          if (key === "sectors" || key === "dividendPayer") {
-            return;
-          }
-
-          if (typeof value === "string" && value.trim() !== "") {
-            params.set(key, value.trim());
-          }
-        });
-
-        if (appliedFilters.dividendPayer !== "all") {
-          params.set("dividendPayer", appliedFilters.dividendPayer);
-        }
-
-        params.set("sortBy", sortBy);
-        params.set("sortDir", sortDir);
-        params.set("page", String(page));
-        params.set("limit", String(limit));
-
-        const endpoint = `/api/screener?${params.toString()}`;
-
-        const res = await fetch(endpoint);
-        if (!res.ok) {
-          throw new Error(`Request failed with status ${res.status}`);
-        }
-
-        const payload = (await res.json()) as ScreenerResponse;
-        setStocks(payload.data || []);
-        setTotal(payload.pagination?.total ?? 0);
-        setTotalPages(payload.pagination?.totalPages ?? 1);
-        setAvailableSectors(payload.availableSectors || []);
-      } catch (err) {
-        setStocks([]);
-        setTotal(0);
-        setTotalPages(1);
-        setError(
-          err instanceof Error ? err.message : "Failed to load screener data",
-        );
-      } finally {
-        setLoading(false);
+  const endpoint = useMemo(() => {
+    const params = new URLSearchParams();
+    if (appliedFilters.sectors.length > 0) {
+      params.set("sectors", appliedFilters.sectors.join(","));
+    }
+    Object.entries(appliedFilters).forEach(([key, value]) => {
+      if (key === "sectors" || key === "dividendPayer") return;
+      if (typeof value === "string" && value.trim() !== "") {
+        params.set(key, value.trim());
       }
-    };
-
-    void runFilter();
+    });
+    if (appliedFilters.dividendPayer !== "all") {
+      params.set("dividendPayer", appliedFilters.dividendPayer);
+    }
+    params.set("sortBy", sortBy);
+    params.set("sortDir", sortDir);
+    params.set("page", String(page));
+    params.set("limit", String(limit));
+    return `/api/screener?${params.toString()}`;
   }, [appliedFilters, sortBy, sortDir, page, limit]);
+
+  const { data, error: swrError, isLoading: loading } = useSWR<ScreenerResponse>(
+    endpoint,
+    fetcher,
+    { keepPreviousData: true }
+  );
+
+  const stocks = data?.data || [];
+  const total = data?.pagination?.total ?? 0;
+  const totalPages = data?.pagination?.totalPages ?? 1;
+  const availableSectors = data?.availableSectors || [];
+  const error = swrError instanceof Error ? swrError.message : swrError ? String(swrError) : null;
 
   const displaySectors =
     availableSectors.length > 0 ? availableSectors : DEFAULT_SECTOR_OPTIONS;

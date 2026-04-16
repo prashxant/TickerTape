@@ -1,66 +1,42 @@
 // app/stock/[symbol]/page.tsx
 "use client";
-import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import Chart from "@/components/Chart";
+import useSWR from "swr";
+
+import dynamic from "next/dynamic";
+const Chart = dynamic(() => import("@/components/Chart"), { ssr: false });
 import StockDetails from "@/components/StockDetails";
 import AboutCompany from "@/components/AboutCompany";
 import Financials from "@/components/Financials";
 import type { StockApiResponse } from "@/lib/types";
 
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  const text = await res.text();
+  const payload = text ? (JSON.parse(text) as StockApiResponse | { error?: string }) : null;
+  if (!res.ok) {
+    const message = payload && typeof payload === "object" && "error" in payload && payload.error
+        ? payload.error : `Request failed with status ${res.status}`;
+    throw new Error(message);
+  }
+  if (!payload || !("quote" in payload) || !("chart" in payload)) {
+    throw new Error("Unexpected API response");
+  }
+  return payload;
+};
+
 export default function StockPage() {
   const params = useParams<{ symbol?: string | string[] }>();
   const symbolParam = params.symbol;
   const symbol = Array.isArray(symbolParam) ? symbolParam[0] : symbolParam;
-  const [data, setData] = useState<StockApiResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!symbol) return;
+  const { data, error: swrError, isLoading: loading } = useSWR<StockApiResponse>(
+    symbol ? `/api/stock?symbol=${encodeURIComponent(symbol)}` : null,
+    fetcher
+  );
 
-    const run = async () => {
-      setError(null);
-      setLoading(true);
-
-      try {
-        const res = await fetch(
-          `/api/stock?symbol=${encodeURIComponent(symbol)}`,
-        );
-        const text = await res.text();
-        const payload = text
-          ? (JSON.parse(text) as StockApiResponse | { error?: string })
-          : null;
-
-        if (!res.ok) {
-          const message =
-            payload &&
-            typeof payload === "object" &&
-            "error" in payload &&
-            payload.error
-              ? payload.error
-              : `Request failed with status ${res.status}`;
-          throw new Error(message);
-        }
-
-        if (!payload || !("quote" in payload) || !("chart" in payload)) {
-          throw new Error("Unexpected API response");
-        }
-
-        setData(payload);
-      } catch (err) {
-        setData(null);
-        setError(
-          err instanceof Error ? err.message : "Failed to load stock data",
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    void run();
-  }, [symbol]);
+  const error = swrError instanceof Error ? swrError.message : swrError ? String(swrError) : null;
 
   if (error) {
     return (
