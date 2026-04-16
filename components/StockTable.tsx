@@ -20,6 +20,15 @@ export default function StockTable({ stocks }: StockTableProps) {
     maximumFractionDigits: 1,
   });
 
+  const compactNumberFormatter = new Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  });
+
+  const percentFormatter = new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: 2,
+  });
+
   if (stocks.length === 0) {
     return (
       <div className="rounded-2xl border border-line border-dashed p-6 text-center text-sm text-muted">
@@ -34,9 +43,14 @@ export default function StockTable({ stocks }: StockTableProps) {
         <thead>
           <tr className="border-b border-line text-[11px] uppercase tracking-[0.14em] text-muted">
             <th className="px-4 py-3 font-medium">Symbol</th>
+            <th className="px-4 py-3 font-medium">Sector</th>
             <th className="px-4 py-3 font-medium">Last</th>
+            <th className="px-4 py-3 font-medium">Change %</th>
             <th className="px-4 py-3 font-medium">PE</th>
             <th className="px-4 py-3 font-medium">Market Cap</th>
+            <th className="px-4 py-3 font-medium">ROE %</th>
+            <th className="px-4 py-3 font-medium">Div Yield %</th>
+            <th className="px-4 py-3 font-medium">Volume</th>
           </tr>
         </thead>
 
@@ -55,8 +69,14 @@ export default function StockTable({ stocks }: StockTableProps) {
                 </Link>
                 <p className="mt-1 text-xs text-muted">{s.name || "Unknown"}</p>
               </td>
+              <td className="px-4 py-3 text-foreground">{s.sector || "-"}</td>
               <td className="px-4 py-3 text-foreground">
                 {s.price == null ? "-" : priceFormatter.format(s.price)}
+              </td>
+              <td className="px-4 py-3 text-foreground">
+                {s.priceChangePercent == null
+                  ? "-"
+                  : `${percentFormatter.format(s.priceChangePercent)}%`}
               </td>
               <td className="px-4 py-3 text-foreground">
                 {s.peRatio == null ? "-" : s.peRatio.toFixed(2)}
@@ -65,6 +85,19 @@ export default function StockTable({ stocks }: StockTableProps) {
                 {s.marketCap == null
                   ? "-"
                   : compactCurrencyFormatter.format(s.marketCap)}
+              </td>
+              <td className="px-4 py-3 text-foreground">
+                {s.roe == null ? "-" : `${percentFormatter.format(s.roe)}%`}
+              </td>
+              <td className="px-4 py-3 text-foreground">
+                {s.dividendYield == null
+                  ? "-"
+                  : `${percentFormatter.format(s.dividendYield)}%`}
+              </td>
+              <td className="px-4 py-3 text-foreground">
+                {s.volume == null
+                  ? "-"
+                  : compactNumberFormatter.format(s.volume)}
               </td>
             </tr>
           ))}

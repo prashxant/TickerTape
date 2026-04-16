@@ -210,7 +210,7 @@ a {
 .ticker-track {
   display: flex;
   width: max-content;
-  animation: ticker-slide 80s linear infinite;
+  animation: ticker-slide 90s linear infinite;
 }
 
 .ticker-viewport:hover .ticker-track {

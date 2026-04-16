@@ -1,12 +1,22 @@
 export interface StockListItem {
   symbol: string;
   name: string | null;
+  sector: string | null;
+  industry: string | null;
   price: number | null;
+  priceChangePercent: number | null;
   marketCap: number | null;
   peRatio: number | null;
+  priceToBook: number | null;
   roe: number | null;
+  roa: number | null;
+  profitMargin: number | null;
+  revenueGrowth: number | null;
+  earningsGrowth: number | null;
   debtEquity: number | null;
   dividendYield: number | null;
+  volume: number | null;
+  averageVolume: number | null;
 }
 
 export type SearchResultItem = Pick<StockListItem, "symbol" | "name">;

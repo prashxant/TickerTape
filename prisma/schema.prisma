@@ -11,13 +11,22 @@ model Stock {
   symbol     String   @unique
   name       String?
   sector     String?
+  industry   String?
 
   price      Float?
+  priceChangePercent Float?
   marketCap  Float?
   peRatio    Float?
+  priceToBook Float?
   roe        Float?
+  roa        Float?
+  profitMargin Float?
+  revenueGrowth Float?
+  earningsGrowth Float?
   debtEquity Float?
   dividendYield Float?
+  volume     Float?
+  averageVolume Float?
 
   updatedAt  DateTime @updatedAt
 }
